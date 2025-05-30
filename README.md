@@ -1,41 +1,98 @@
-# XML Comparator for WCS and Microservice Tables
+🧾 XML Comparator: WCS vs Microservice
+📌 Overview
+This Python tool compares XML data for orders from two different systems—WCS and Microservice—by:
 
-## 📌 Overview
+Reading order ID pairs from a CSV file (orders_to_compare.csv)
 
-This project compares XML data from two MySQL tables: `wcs` and `microservice`. Each table contains 15 XML records, and the program performs a **pairwise comparison**—comparing the first XML in `wcs` with the first in `microservice`, the second with the second, and so on.
+Fetching corresponding XMLs from a MySQL database
 
-It helps identify differences in structure, content, or values between corresponding XML entries in both systems.
+Performing tag-level and attribute-level comparisons
 
----
+Logging differences to a CSV file
 
-🚀 Features
-✅ Connects to a MySQL database and retrieves XML data from two tables: wcs and micro.
-✅ Parses XML strings into element trees.
-✅ Flattens XML trees into dictionaries of tags and their attributes/text.
-✅ Compares:
+Useful for debugging integration issues, verifying sync integrity, or comparing transformed XML structures between systems.
+
+✅ Features
+📥 Reads WCS and Microservice order_id pairs from a CSV file
+
+🗃️ Fetches corresponding XMLs from a MySQL table named orders
+
+🧠 Parses and flattens XMLs into structured tag-attribute-text dictionaries
+
+🔍 Compares:
+
 Missing tags
+
 Extra tags
+
 Missing or mismatched attributes
-Text content differences
-✅ Records the differences with context (tag path, attribute name, difference type).
-✅ Outputs the comparison results to a CSV file (diff15.csv) with a row per difference and pair index.
+
+Differences in text content
+
+XML parsing errors
+
+📄 Saves all differences in a CSV file with clear context
+
+📂 Input Files
+orders_to_compare.csv
+This file should contain rows with two columns:
+
+wcs_order_id	micro_order_id
+1001	2001
+1002	2002
+...	...
+
+Each row represents a WCS and Microservice XML pair to compare.
+
+🗃️ Database Schema
+Table: orders
+
+order_id	xml_content
+1001	<order>...</order>
+2001	<order>...</order>
+
+Both WCS and Microservice XMLs are stored in the same orders table and distinguished using order_id.
+
+🧪 Output
+Creates a CSV file: order_comapare_xml_differences.csv
+Each row in the file represents a detected difference.
+
+Columns:
+
+Order Pair (e.g., 1001-2001)
+
+Difference Type (e.g., Text mismatch, Tag missing, Attribute mismatch)
+
+Tag Path
+
+Attribute (or (text))
 
 🛠 How It Works
-Data Retrieval:
-Fetches XML data (up to 15 records by default) from both wcs and micro tables using mysql.connector.
+Read Input Pairs:
+Reads WCS and Micro order ID pairs from orders_to_compare.csv.
 
-XML Parsing:
-Converts XML strings to element trees using xml.etree.ElementTree.
+Retrieve XMLs:
+For each pair, fetches XML content from MySQL (orders table).
 
-Flattening XML:
-Recursively flattens each XML tree into a structure of tags with a list of associated attributes and text.
+Parse XMLs:
+Parses XMLs into element trees. Logs any parse errors.
 
-Comparison Logic:
-For each tag and index in WCS XML, checks for:
-Missing counterparts in microservice XML.
-Differences in attribute values.
-Differences in text content.
+Flatten XML:
+Converts nested XML structures into tag-based dictionaries.
 
-Detects extra tags present only in microservice XML.
+Compare:
+Compares the structure and attributes of WCS vs Microservice XML.
 
-Result Logging:Writes differences into a CSV with columns: Pair Index, Difference Type, Tag Path, and Attribute.
+Log Results:
+Saves results to order_comapare_xml_differences.csv.
+
+📦 Requirements
+Python 3.8+
+
+MySQL Server
+
+Python Packages:
+pip install mysql-connector-python
+▶️ Run the Script
+python compare_from_csv.py
+Make sure to update the MySQL credentials in the script before running.
